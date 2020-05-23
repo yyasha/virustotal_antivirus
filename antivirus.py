@@ -8,11 +8,10 @@ import shutil
 import plyer
 from pathlib import Path
 
-#API_KEY = 'Sign-Up for API Key at virustotal.com'
-API_KEY = '19410b19357e860746d8dd6982a9667be46ffe5b58a2361e29e8455839eff61d'
+API_KEY = 'Sign-Up for API Key at virustotal.com'  #your API key
 
-directory = 'C:/Users/yashs/Downloads/antivirus/detecter' #C:/Users/
-directoryTo = 'C:/Users/yashs/Downloads'
+directory = 'the directory where the scan takes place' #C:/Users/
+directoryTo = 'the directory to move after the scan'
 
 sleep = 10
 
