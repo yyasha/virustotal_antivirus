@@ -8,19 +8,30 @@ import shutil
 import plyer
 from pathlib import Path
 
-API_KEY = 'Sign-Up for API Key at virustotal.com'  #your API key
+API_KEY = 'Sign-Up for API Key at virustotal.com'
 
-directory = 'the directory where the scan takes place' #C:/Users/
-directoryTo = 'the directory to move after the scan'
+directory = 'C:/Users/user/Downloads/antivirus/detecter' #C:/Users/
+directoryTo = 'C:/Users/user/Downloads'
+directoryPhotos = 'C:/Users/user/Downloads/Photos'
+directoryDocuments = 'C:/Users/user/Downloads/Documents'
+directoryMusic = 'C:/Users/user/Downloads/Music'
+directoryVideos = 'C:/Users/user/Downloads/Videos'
 
-sleep = 10
+PhotosExtension = ['.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff']
+DocumentsExtension = ['.pdf', '.doc', '.pptx', '.txt', '.rtf', '.docx', '.xls', '.xlsx', '.xlsm', '.ods']
+MusicExtension = ['.mp3', '.wav', '.wma']
+VideosExtension = ['.mp4', '.avi', '.wmf']
+
+Moved = False
+
+sleepT = 1
 
 lastLen = 0
 
 try:
 
 	while True:
-		time.sleep(sleep)
+		time.sleep(sleepT)
 
 		if lastLen != len(os.listdir(path=directory)):
 
@@ -44,14 +55,53 @@ try:
 
 				response = vt.get_file_report(m.hexdigest())
 				pull = json.loads(json.dumps(response, sort_keys=False, indent=4))
-				results = pull["results"]
+
+				try:
+					results = pull["results"]
+				except Exception as e:
+					time.sleep(10)
+					continue
+
 				try:
 					detected = results["positives"]
-					if detected > 0:
-						os.remove(filename)
-						plyer.notification.notify( message=f"В файле {i} обнаружен вирус ({detected}), файл будет удалён", app_name='VirusTotal', app_icon='icon.ico', title='VirusTotal', )
-						detected = 0
 				except Exception as e:
+					detected = 0
+
+				if detected > 0:
+					os.remove(filename)
+					plyer.notification.notify( message=f"В файле {i} обнаружен вирус ({detected}), файл будет удалён", app_name='VirusTotal', app_icon='icon.ico', title='VirusTotal', )
+					detected = 0
+					Moved = True
+
+				if Moved == False:
+					for ex in PhotosExtension:
+						if Path(i).suffix == ex:
+							shutil.move(filename, directoryPhotos)
+							Moved = True
+							break
+
+				if Moved == False:
+					for ex in DocumentsExtension:
+						if Path(i).suffix == ex:
+							shutil.move(filename, directoryDocuments)
+							Moved = True
+							break
+
+				if Moved == False:
+					for ex in MusicExtension:
+						if Path(i).suffix == ex:
+							shutil.move(filename, directoryMusic)
+							Moved = True
+							break
+
+				if Moved == False:
+					for ex in VideosExtension:
+						if Path(i).suffix == ex:
+							shutil.move(filename, directoryVideos)
+							Moved = True
+							break
+
+				if Moved == False:
 					shutil.move(filename, directoryTo)
 
 except Exception as e:
